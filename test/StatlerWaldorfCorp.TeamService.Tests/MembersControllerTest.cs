@@ -87,10 +87,12 @@ namespace StatlerWaldorfCorp.TeamService
             newMember.LastName = "Doe";
             controller.CreateMember(newMember, teamId);
 
-            ICollection<Member> members = controller.GetMembers(teamId).Value;
+            var result = controller.GetMembers(teamId);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var members = Assert.IsAssignableFrom<ICollection<Member>>(okResult.Value);
             Assert.Equal(2, members.Count());
-            Assert.NotNull(members.Where(m => m.Id == firstMemberId).First().Id);
-            Assert.NotNull(members.Where(m => m.Id == secondMemberId).First().Id);
+            Assert.NotNull(members.Where(m => m.Id == firstMemberId).First());
+            Assert.NotNull(members.Where(m => m.Id == secondMemberId).First());
         }
 
         [Fact]
@@ -103,9 +105,9 @@ namespace StatlerWaldorfCorp.TeamService
             Team team = new Team("TestTeam", teamId);
             var debugTeam = repository.Add(team);
 
-            ActionResult<ICollection<Member>> result = controller.GetMembers(teamId);
-            Assert.False(result is NotFoundResult);
-            ICollection<Member> members = controller.GetMembers(teamId).Value;
+            var result = controller.GetMembers(teamId);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var members = Assert.IsAssignableFrom<ICollection<Member>>(okResult.Value);
             Assert.Empty(members);
         }
 
@@ -116,7 +118,7 @@ namespace StatlerWaldorfCorp.TeamService
             MembersController controller = new MembersController(repository);
 
             var result = controller.GetMembers(Guid.NewGuid());
-            Assert.True(result is NotFoundResult);
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
@@ -126,7 +128,7 @@ namespace StatlerWaldorfCorp.TeamService
             MembersController controller = new MembersController(repository);
 
             var result = controller.GetMember(Guid.NewGuid(), Guid.NewGuid());
-            Assert.True(result is NotFoundResult);
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
@@ -140,7 +142,7 @@ namespace StatlerWaldorfCorp.TeamService
             var debugTeam = repository.Add(team);
 
             var result = controller.GetMember(teamId, Guid.NewGuid());
-            Assert.True(result is NotFoundResult);
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
@@ -169,8 +171,8 @@ namespace StatlerWaldorfCorp.TeamService
             team = repository.Get(teamId);
             Member testMember = team.Members.Where(m => m.Id == memberId).First();
 
-            Assert.Equal(testMember.FirstName, "Bob");
-            Assert.Equal(testMember.LastName, "Jones");
+            Assert.Equal("Bob", testMember.FirstName);
+            Assert.Equal("Jones", testMember.LastName);
         }
 
         [Fact]

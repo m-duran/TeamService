@@ -15,9 +15,9 @@ namespace StatlerWaldorfCorp.TeamService
             TeamsController controller = new TeamsController(new TestMemoryTeamRepository());
             var rawTeams = (IEnumerable<Team>)(controller.GetAllTeams() as ObjectResult).Value;
             List<Team> teams = new List<Team>(rawTeams);
-            Assert.Equal(teams.Count, 2);
-            Assert.Equal(teams[0].Name, "one");
-            Assert.Equal(teams[1].Name, "two");
+            Assert.Equal(2, teams.Count);
+            Assert.Equal("one", teams[0].Name);
+            Assert.Equal("two", teams[1].Name);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace StatlerWaldorfCorp.TeamService
             Team t = new Team("sample");
             var result = controller.CreateTeam(t);
             //TODO: also assert that the destination URL of the new team reflects the team's GUId
-            Assert.Equal((result as ObjectResult).StatusCode, 201);
+            Assert.Equal(201, (result as ObjectResult).StatusCode);
 
             var actionResult = controller.GetAllTeams() as ObjectResult;
             var newTeamsRaw = (IEnumerable<Team>)(controller.GetAllTeams() as ObjectResult).Value;
@@ -85,7 +85,7 @@ namespace StatlerWaldorfCorp.TeamService
             Assert.Null(sampleTeam);
 
             Team retrievedTeam = (Team)(controller.GetTeam(id) as ObjectResult).Value;
-            Assert.Equal(retrievedTeam.Name, "sample2");
+            Assert.Equal("sample2", retrievedTeam.Name);
         }
 
         [Fact]
